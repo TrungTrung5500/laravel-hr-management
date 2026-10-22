@@ -10,6 +10,19 @@
                 <div><strong>Ca làm việc đang mở</strong><span>Check-in lúc {{ $attendance->check_in_at->format('H:i') }}</span></div>
                 <button class="button" type="submit"><span class="material-symbols-outlined">logout</span>Check-out</button>
             </form>
+        @elseif($attendance?->check_out_at)
+            <div class="hr-dashboard-checkout-bar" style="background:#f1f5f9; border-color:#cbd5e1;">
+                <div>
+                    <strong>Ca làm việc hôm nay đã Check-out lúc {{ $attendance->check_out_at->format('H:i') }}</strong>
+                    <span>Bạn đã hoàn thành ca làm việc.</span>
+                </div>
+                <form method="POST" action="{{ route('attendance.reset-today') }}" onsubmit="return confirm('Đặt lại dữ liệu chấm công hôm nay để bạn có thể thực hiện Check-in lại?');">
+                    @csrf
+                    <button class="button button-light" type="submit" style="font-size:12px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">refresh</span> Đặt lại để Check-in lại (Demo)
+                    </button>
+                </form>
+            </div>
         @endif
 
         <div class="stitch-summary-grid hr-module-summary">

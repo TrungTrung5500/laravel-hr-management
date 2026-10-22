@@ -16,11 +16,14 @@
             <div class="stitch-sidebar-main">
                 <a class="brand stitch-brand" href="{{ route('hr.home') }}">
                     <div class="brand-mark stitch-brand-mark">H</div>
-                    <div><div class="brand-title stitch-brand-title">HUIT</div><div class="brand-sub stitch-brand-sub">HR Management</div></div>
+                    <div><div class="brand-title stitch-brand-title">HUIT</div><div class="brand-sub stitch-brand-sub">HR MANAGEMENT</div></div>
                 </a>
                 <nav class="nav stitch-nav" aria-label="Điều hướng HR">
                     <a class="stitch-nav-link {{ ($active ?? '') === 'dashboard' ? 'active' : '' }}" href="{{ route('hr.home') }}"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
                     <a class="stitch-nav-link {{ ($active ?? '') === 'attendance' ? 'active' : '' }}" href="{{ route('hr.attendance.index') }}"><span class="material-symbols-outlined">schedule</span><span>Quản lý chấm công</span></a>
+                    <a class="stitch-nav-link {{ ($active ?? '') === 'leaves' ? 'active' : '' }}" href="{{ route('hr.leaves.index') }}"><span class="material-symbols-outlined">event_busy</span><span>Quản lý nghỉ phép</span></a>
+                    <a class="stitch-nav-link {{ ($active ?? '') === 'payroll' ? 'active' : '' }}" href="{{ route('hr.payroll.index') }}"><span class="material-symbols-outlined">payments</span><span>Quản lý bảng lương</span></a>
+                    <a class="stitch-nav-link {{ ($active ?? '') === 'parking' ? 'active' : '' }}" href="{{ route('hr.parking.index') }}"><span class="material-symbols-outlined">local_parking</span><span>Quản lý gửi xe</span></a>
                     <a class="stitch-nav-link {{ ($active ?? '') === 'employees' ? 'active' : '' }}" href="{{ route('hr.employees') }}"><span class="material-symbols-outlined">groups</span><span>Quản lý nhân viên</span></a>
                     <a class="stitch-nav-link {{ ($active ?? '') === 'departments' ? 'active' : '' }}" href="{{ route('hr.departments') }}"><span class="material-symbols-outlined">corporate_fare</span><span>Phòng ban</span></a>
                     <a class="stitch-nav-link {{ ($active ?? '') === 'positions' ? 'active' : '' }}" href="{{ route('hr.positions') }}"><span class="material-symbols-outlined">badge</span><span>Chức vụ</span></a>
@@ -43,6 +46,7 @@
             <header class="topbar stitch-topbar">
                 <div class="stitch-greeting"><div class="stitch-greeting-line"><span class="top-title">{{ $topTitle ?? 'Cổng nhân sự' }}</span><span class="stitch-dot">•</span><span class="stitch-hello">{{ $topSub ?? 'Không gian làm việc HR' }}</span></div></div>
                 <div class="stitch-top-actions">
+                    @include('partials.screen-scale')
                     <button class="stitch-notification" type="button" aria-label="Thông báo"><span class="material-symbols-outlined">notifications</span><span class="stitch-notification-dot"></span></button>
                     <div class="user-chip stitch-user-chip"><div class="avatar stitch-user-avatar"><span class="material-symbols-outlined">person</span></div><div class="stitch-user-copy"><strong>{{ $employee->full_name ?? auth()->user()->name ?? 'Người dùng' }}</strong><small>HR</small></div></div>
                 </div>

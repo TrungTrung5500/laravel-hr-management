@@ -15,6 +15,7 @@ class Employee extends Model
     protected $fillable = [
         'user_id', 'department_id', 'position_id', 'employee_code', 'full_name',
         'date_of_birth', 'gender', 'cccd', 'email', 'phone', 'address', 'avatar', 'hire_date',
+        'base_salary', 'meal_allowance_daily',
         'employment_status', 'termination_date', 'termination_reason',
     ];
 
@@ -24,6 +25,8 @@ class Employee extends Model
             'date_of_birth' => 'date',
             'hire_date' => 'date',
             'termination_date' => 'date',
+            'base_salary' => 'float',
+            'meal_allowance_daily' => 'float',
             'employment_status' => EmploymentStatus::class,
         ];
     }
@@ -61,5 +64,20 @@ class Employee extends Model
     public function personnelProcesses(): HasMany
     {
         return $this->hasMany(PersonnelProcess::class);
+    }
+
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    public function vehicleRegistrations(): HasMany
+    {
+        return $this->hasMany(VehicleRegistration::class);
+    }
+
+    public function payrolls(): HasMany
+    {
+        return $this->hasMany(Payroll::class);
     }
 }

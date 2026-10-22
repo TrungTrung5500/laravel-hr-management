@@ -79,4 +79,18 @@ class AttendanceController extends Controller
 
         return redirect()->route('login');
     }
+
+    public function resetToday(Request $request): RedirectResponse
+    {
+        $employee = $request->user()->employee;
+        if ($employee) {
+            $employee->attendances()->whereDate('work_date', today())->delete();
+        }
+
+        if ($request->user()->role === UserRole::HR) {
+            return redirect()->route('hr.home')->with('success', 'Đã đặt lại dữ liệu chấm công hôm nay. Bạn có thể thực hiện Check-in lại.');
+        }
+
+        return redirect()->route('employee.home')->with('success', 'Đã đặt lại dữ liệu chấm công hôm nay. Bạn có thể thực hiện Check-in lại.');
+    }
 }

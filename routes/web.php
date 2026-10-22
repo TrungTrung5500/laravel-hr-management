@@ -6,11 +6,23 @@ use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCheckInController;
 use App\Http\Controllers\AttendanceManagementController;
+use App\Http\Controllers\EmployeeLeaveController;
+use App\Http\Controllers\EmployeeParkingController;
+use App\Http\Controllers\EmployeePayrollController;
 use App\Http\Controllers\EmployeeProfileController;
 use App\Http\Controllers\EmployeeRequestController;
 use App\Http\Controllers\EmployeeTaskController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HrManagementController;
+use App\Http\Controllers\HrDepartmentController;
+use App\Http\Controllers\HrEmployeeController;
+use App\Http\Controllers\HrLeaveController;
+use App\Http\Controllers\HrParkingController;
+use App\Http\Controllers\HrPayrollController;
+use App\Http\Controllers\HrPersonnelProcessController;
+use App\Http\Controllers\HrPositionController;
+use App\Http\Controllers\HrRequestController;
+use App\Http\Controllers\HrTaskController;
 use App\Http\Controllers\HrAttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -40,6 +52,8 @@ Route::middleware(['auth', 'active.user'])->group(function (): void {
             ->name('attendance.check-out');
         Route::post('/attendance/check-out/{_compat?}', [AttendanceController::class, 'checkout'])
             ->name('attendance.checkout');
+        Route::post('/attendance/reset-today', [AttendanceController::class, 'resetToday'])
+            ->name('attendance.reset-today');
     });
 
     Route::prefix('admin')->middleware('role:admin')->group(function (): void {
@@ -59,23 +73,67 @@ Route::middleware(['auth', 'active.user'])->group(function (): void {
         Route::get('/', [HrManagementController::class, 'dashboard'])->name('hr.home');
         Route::get('/dashboard', [HrManagementController::class, 'dashboard'])->name('hr.dashboard');
         Route::middleware('employee.checked.in')->group(function (): void {
-        Route::get('/employees', [HrManagementController::class, 'employees'])->name('hr.employees');
-        Route::get('/departments', [HrManagementController::class, 'departments'])->name('hr.departments');
-        Route::get('/positions', [HrManagementController::class, 'positions'])->name('hr.positions');
-        Route::get('/attendance', [AttendanceManagementController::class, 'index'])->name('hr.attendance.index');
-        Route::get('/attendance/{attendance}', [AttendanceManagementController::class, 'show'])->name('hr.attendances.show');
-        Route::match(['put', 'patch'], '/attendance/{attendance}', [AttendanceManagementController::class, 'update'])->name('hr.attendances.update');
-        // Compatibility names used by legacy HR attendance views and tests.
-        // The optional segment keeps the generated URL identical while avoiding
-        // duplicate route names for the same URI in Laravel's route collection.
-        Route::get('/attendance/{_compat?}', [AttendanceManagementController::class, 'index'])->name('hr.attendances.index');
-        Route::get('/attendance/{attendance}/{_compat?}', [AttendanceManagementController::class, 'show'])->name('hr.attendance.show');
-        Route::match(['put', 'patch'], '/attendance/{attendance}/{_compat?}', [AttendanceManagementController::class, 'update'])->name('hr.attendance.update');
-        Route::get('/tasks', [HrManagementController::class, 'tasks'])->name('hr.tasks');
-        Route::get('/requests', [HrManagementController::class, 'requests'])->name('hr.requests');
-        Route::get('/recruitment', [HrManagementController::class, 'recruitment'])->name('hr.recruitment');
-        Route::get('/termination', [HrManagementController::class, 'termination'])->name('hr.termination');
-        Route::get('/profile', [HrManagementController::class, 'profile'])->name('hr.profile');
+            Route::get('/employees', [HrManagementController::class, 'employees'])->name('hr.employees');
+            Route::get('/employees/create', [HrEmployeeController::class, 'create'])->name('hr.employees.create');
+            Route::post('/employees', [HrEmployeeController::class, 'store'])->name('hr.employees.store');
+            Route::get('/employees/{employee}', [HrEmployeeController::class, 'show'])->name('hr.employees.show');
+            Route::get('/employees/{employee}/edit', [HrEmployeeController::class, 'edit'])->name('hr.employees.edit');
+            Route::patch('/employees/{employee}', [HrEmployeeController::class, 'update'])->name('hr.employees.update');
+            Route::get('/departments', [HrManagementController::class, 'departments'])->name('hr.departments');
+            Route::get('/departments/create', [HrDepartmentController::class, 'create'])->name('hr.departments.create');
+            Route::post('/departments', [HrDepartmentController::class, 'store'])->name('hr.departments.store');
+            Route::get('/departments/{department}', [HrDepartmentController::class, 'show'])->name('hr.departments.show');
+            Route::get('/departments/{department}/edit', [HrDepartmentController::class, 'edit'])->name('hr.departments.edit');
+            Route::patch('/departments/{department}', [HrDepartmentController::class, 'update'])->name('hr.departments.update');
+            Route::delete('/departments/{department}', [HrDepartmentController::class, 'destroy'])->name('hr.departments.destroy');
+            Route::get('/positions', [HrManagementController::class, 'positions'])->name('hr.positions');
+            Route::get('/positions/create', [HrPositionController::class, 'create'])->name('hr.positions.create');
+            Route::post('/positions', [HrPositionController::class, 'store'])->name('hr.positions.store');
+            Route::get('/positions/{position}', [HrPositionController::class, 'show'])->name('hr.positions.show');
+            Route::get('/positions/{position}/edit', [HrPositionController::class, 'edit'])->name('hr.positions.edit');
+            Route::patch('/positions/{position}', [HrPositionController::class, 'update'])->name('hr.positions.update');
+            Route::delete('/positions/{position}', [HrPositionController::class, 'destroy'])->name('hr.positions.destroy');
+            Route::get('/attendance', [AttendanceManagementController::class, 'index'])->name('hr.attendance.index');
+            Route::get('/attendance/{attendance}', [AttendanceManagementController::class, 'show'])->name('hr.attendances.show');
+            Route::match(['put', 'patch'], '/attendance/{attendance}', [AttendanceManagementController::class, 'update'])->name('hr.attendances.update');
+            // Compatibility names used by legacy HR attendance views and tests.
+            // The optional segment keeps the generated URL identical while avoiding
+            // duplicate route names for the same URI in Laravel's route collection.
+            Route::get('/attendance/{_compat?}', [AttendanceManagementController::class, 'index'])->name('hr.attendances.index');
+            Route::get('/attendance/{attendance}/{_compat?}', [AttendanceManagementController::class, 'show'])->name('hr.attendance.show');
+            Route::match(['put', 'patch'], '/attendance/{attendance}/{_compat?}', [AttendanceManagementController::class, 'update'])->name('hr.attendance.update');
+            Route::get('/tasks', [HrManagementController::class, 'tasks'])->name('hr.tasks');
+            Route::get('/tasks/create', [HrTaskController::class, 'create'])->name('hr.tasks.create');
+            Route::post('/tasks', [HrTaskController::class, 'store'])->name('hr.tasks.store');
+            Route::get('/tasks/{task}', [HrTaskController::class, 'show'])->name('hr.tasks.show');
+            Route::get('/tasks/{task}/edit', [HrTaskController::class, 'edit'])->name('hr.tasks.edit');
+            Route::patch('/tasks/{task}', [HrTaskController::class, 'update'])->name('hr.tasks.update');
+            Route::delete('/tasks/{task}', [HrTaskController::class, 'destroy'])->name('hr.tasks.destroy');
+            Route::get('/requests', [HrRequestController::class, 'index'])->name('hr.requests');
+            Route::get('/requests/{requestModel}', [HrRequestController::class, 'show'])->name('hr.requests.show');
+            Route::get('/leaves', [HrLeaveController::class, 'index'])->name('hr.leaves.index');
+            Route::get('/leaves/{leave}', [HrLeaveController::class, 'show'])->name('hr.leaves.show');
+            Route::patch('/leaves/{leave}', [HrLeaveController::class, 'update'])->name('hr.leaves.update');
+            Route::get('/parking', [HrParkingController::class, 'index'])->name('hr.parking.index');
+            Route::get('/parking/{vehicle}', [HrParkingController::class, 'show'])->name('hr.parking.show');
+            Route::patch('/parking/{vehicle}', [HrParkingController::class, 'update'])->name('hr.parking.update');
+            Route::delete('/parking/{vehicle}', [HrParkingController::class, 'destroy'])->name('hr.parking.destroy');
+            Route::get('/payroll', [HrPayrollController::class, 'index'])->name('hr.payroll.index');
+            Route::post('/payroll/generate', [HrPayrollController::class, 'generate'])->name('hr.payroll.generate');
+            Route::get('/payroll/{payroll}', [HrPayrollController::class, 'show'])->name('hr.payroll.show');
+            Route::patch('/payroll/{payroll}', [HrPayrollController::class, 'update'])->name('hr.payroll.update');
+            Route::delete('/payroll/{payroll}', [HrPayrollController::class, 'destroy'])->name('hr.payroll.destroy');
+            Route::get('/recruitment', [HrManagementController::class, 'recruitment'])->name('hr.recruitment');
+            Route::get('/recruitment/create', [HrPersonnelProcessController::class, 'create'])->defaults('type', 'recruitment')->name('hr.recruitment.create');
+            Route::post('/recruitment', [HrPersonnelProcessController::class, 'store'])->defaults('type', 'recruitment')->name('hr.recruitment.store');
+            Route::get('/termination', [HrManagementController::class, 'termination'])->name('hr.termination');
+            Route::get('/termination/create', [HrPersonnelProcessController::class, 'create'])->defaults('type', 'termination')->name('hr.termination.create');
+            Route::post('/termination', [HrPersonnelProcessController::class, 'store'])->defaults('type', 'termination')->name('hr.termination.store');
+            Route::get('/processes/{process}', [HrPersonnelProcessController::class, 'show'])->name('hr.processes.show');
+            Route::get('/processes/{process}/edit', [HrPersonnelProcessController::class, 'edit'])->name('hr.processes.edit');
+            Route::patch('/processes/{process}', [HrPersonnelProcessController::class, 'update'])->name('hr.processes.update');
+            Route::get('/profile', [HrManagementController::class, 'profile'])->name('hr.profile');
+            Route::patch('/profile', [HrManagementController::class, 'updateProfile'])->name('hr.profile.update');
         });
     });
 
@@ -97,6 +155,16 @@ Route::middleware(['auth', 'active.user'])->group(function (): void {
             Route::get('/requests/{requestModel}/edit', [EmployeeRequestController::class, 'edit'])->name('employee.requests.edit');
             Route::put('/requests/{requestModel}', [EmployeeRequestController::class, 'update'])->name('employee.requests.update');
             Route::delete('/requests/{requestModel}', [EmployeeRequestController::class, 'destroy'])->name('employee.requests.destroy');
+            Route::get('/leaves', [EmployeeLeaveController::class, 'index'])->name('employee.leaves.index');
+            Route::get('/leaves/create', [EmployeeLeaveController::class, 'create'])->name('employee.leaves.create');
+            Route::post('/leaves', [EmployeeLeaveController::class, 'store'])->name('employee.leaves.store');
+            Route::delete('/leaves/{leave}', [EmployeeLeaveController::class, 'destroy'])->name('employee.leaves.destroy');
+            Route::get('/parking', [EmployeeParkingController::class, 'index'])->name('employee.parking.index');
+            Route::get('/parking/create', [EmployeeParkingController::class, 'create'])->name('employee.parking.create');
+            Route::post('/parking', [EmployeeParkingController::class, 'store'])->name('employee.parking.store');
+            Route::delete('/parking/{vehicle}', [EmployeeParkingController::class, 'destroy'])->name('employee.parking.destroy');
+            Route::get('/payroll', [EmployeePayrollController::class, 'index'])->name('employee.payroll.index');
+            Route::get('/payroll/{payroll}', [EmployeePayrollController::class, 'show'])->name('employee.payroll.show');
         });
     });
 });
